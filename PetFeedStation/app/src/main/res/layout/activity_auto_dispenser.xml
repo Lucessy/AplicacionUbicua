@@ -19,8 +19,7 @@
             android:text="Plan el viernes"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textSize="24sp"/>
 
         <ImageButton
             android:id="@+id/button_add"
@@ -52,8 +51,6 @@
         android:gravity="center"
         android:padding="16dp">
 
-
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -66,14 +63,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="N° comidas:"
-                android:textSize="22sp"
-                android:textColor="@android:color/black" />
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:background="@color/lightGray"/>
 
             <TextView
                 android:id="@+id/num_meals_total"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="5"
+                android:text="1"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />
@@ -92,34 +90,47 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="N° porciones:"
-                android:textSize="22sp"
-                android:textColor="@android:color/black" />
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:background="@color/lightGray"/>
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/num_portions_total"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/num_portions_total"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="14"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" porcion/es"
-                    android:textSize="20sp"
-                    android:textColor="@android:color/black" />
-            </LinearLayout>
+                android:text="3"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/total_grams_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nº gramos:"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:background="@color/lightGray"/>
+
+            <TextView
+                android:id="@+id/num_total_grams"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="50"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
+
+        </LinearLayout>
     </LinearLayout>
 
     <!-- ScrollView para los horarios -->
@@ -133,51 +144,16 @@
         android:layout_marginTop="-8dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/time_food_shape">
+        android:background="@color/white">
 
         <LinearLayout
+            android:id="@+id/scroll_view_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- Ejemplo de entrada de horario -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/time_food_shape"
-                android:orientation="horizontal"
-                android:padding="12dp">
-
-                <TextView
-                    android:id="@+id/time"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="08:00"
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/num_portions"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:text="3 porciones"
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp" />
-
-                <ImageButton
-                    android:id="@+id/edit_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/edit_icon"
-                    app:tint="@color/selectedColor"
-                    android:background="@android:color/transparent"/>
-
-            </LinearLayout>
-
+            android:padding="16dp"
+            android:divider="?android:attr/dividerHorizontal"
+            android:showDividers="middle">
         </LinearLayout>
 
     </ScrollView>
@@ -192,7 +168,8 @@
         android:textSize="18sp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_above="@id/button_save"/>
+        android:layout_above="@id/button_save"
+        android:visibility="gone"/>
 
     <!-- Botón para guardar -->
     <Button

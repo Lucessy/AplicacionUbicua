@@ -5,8 +5,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,7 +20,6 @@ public class SettingsActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         EditText editGramsPerPortion = findViewById(R.id.edit_grams_per_portion);
-        RadioGroup radioGroupScheduleType = findViewById(R.id.radio_group_schedule_type);
         EditText editMaxPortions = findViewById(R.id.edit_max_portions);
         Button buttonSaveSettings = findViewById(R.id.button_save_settings);
 
@@ -30,19 +27,11 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String gramsPerPortion = editGramsPerPortion.getText().toString();
-                int selectedScheduleTypeId = radioGroupScheduleType.getCheckedRadioButtonId();
-                String scheduleType = selectedScheduleTypeId == R.id.radio_24h ? "24h" : "12h";
                 String maxPortions = editMaxPortions.getText().toString();
 
                 // Validar los gramos por porción
                 if (Integer.parseInt(gramsPerPortion) > 250) {
                     Toast.makeText(SettingsActivity.this, "Gramos por porción excedieron los 250 gramos", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                // Validar que se haya seleccionado un tipo de horario
-                if (selectedScheduleTypeId == -1) {
-                    Toast.makeText(SettingsActivity.this, "Por favor selecciona un tipo de horario", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -56,8 +45,8 @@ public class SettingsActivity extends AppCompatActivity {
 
                 // Save the configurations (you can use SharedPreferences or any other method)
                 // For demonstration, we will just show a Toast message
-                Toast.makeText(SettingsActivity.this, "Settings Saved:\nGrams per Portion: " + gramsPerPortion +
-                        "\nSchedule Type: " + scheduleType + "\nMax Portions: " + maxPortions, Toast.LENGTH_LONG).show();
+                Toast.makeText(SettingsActivity.this, "Settings Saved:\nGrams per Portion: " + gramsPerPortion
+                        + "\nMax Portions: " + maxPortions, Toast.LENGTH_LONG).show();
             }
         });
     }

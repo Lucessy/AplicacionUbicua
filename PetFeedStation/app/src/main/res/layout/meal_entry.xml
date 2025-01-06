@@ -1,0 +1,55 @@
+<!-- meal_entry.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/time_food_shape"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="08:00"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_vertical"/>
+
+    <TextView
+        android:id="@+id/num_portions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:text="3 porción/es"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:gravity="left"
+        android:layout_gravity="center_vertical"/>
+
+    <ImageButton
+        android:id="@+id/edit_button_meal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/edit_icon"
+        android:background="@android:color/transparent"
+        android:contentDescription="edit_button"
+        android:backgroundTint="@color/selectedColor"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="0.5"/>
+
+    <ImageButton
+        android:id="@+id/delete_button_meal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/delete_icon"
+        android:background="@android:color/transparent"
+        android:contentDescription="delete_button"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_vertical"
+        />
+
+</LinearLayout>
