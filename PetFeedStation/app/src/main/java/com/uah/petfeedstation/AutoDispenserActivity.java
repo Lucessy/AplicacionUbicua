@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,9 +54,11 @@ public class AutoDispenserActivity extends AppCompatActivity {
 
         /* Actualizar valores */
         // Obtener los valores de la base de datos aquí ---------------------------------------------------------------
-        gramsPerPortion = 50; // Gramos por porción
+        //gramsPerPortion = 50; // Gramos por porción
         numTotalMeals = 0; // Número total de comidas
         numTotalPortions = 0; // Número de porciones
+        SharedPreferences sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE);
+        gramsPerPortion = sharedPreferences.getInt("gramsPerPortion", 0);
 
         // Actualizar los TextViews con los valores obtenidos
         TextView numMealsTextView = findViewById(R.id.num_meals_total);
@@ -236,7 +239,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
             public void onClick(View v) {
                 scrollViewLayout.removeView(newMealEntry);
 
-                Meal meal = new Meal(time, portions);
+                Meal meal = new Meal(timeTextView.getText().toString(), portionsTextView.getText().toString().split(" ")[0]);
                 meals.remove(meal);
 
                 updateTotalValues();

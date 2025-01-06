@@ -24,7 +24,7 @@
         android:id="@+id/label_grams_per_portion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Gramos por porción"
+        android:text="Gramos por porción:"
         android:textSize="20dp"
         android:layout_below="@id/toolbar"
         android:layout_marginTop="16dp"
@@ -33,29 +33,13 @@
     <EditText
         android:id="@+id/edit_grams_per_portion"
         android:layout_width="match_parent"
+        android:text="20"
         android:layout_height="wrap_content"
         android:inputType="number"
         android:layout_below="@id/label_grams_per_portion"
         android:layout_margin="16dp"/>
 
     <!-- Número máximo porciones -->
-    <TextView
-        android:id="@+id/label_max_portions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Número máximo de porciones"
-        android:textSize="20dp"
-        android:layout_below="@id/edit_grams_per_portion"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"/>
-
-    <EditText
-        android:id="@+id/edit_max_portions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:layout_below="@id/label_max_portions"
-        android:layout_margin="16dp"/>
 
     <!-- Save Button -->
     <Button
@@ -63,7 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Guardar"
-        android:layout_below="@id/edit_max_portions"
+        android:layout_below="@id/edit_grams_per_portion"
         android:backgroundTint="@color/selectedColor"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"/>

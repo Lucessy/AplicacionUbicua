@@ -2,6 +2,7 @@ package com.uah.petfeedstation;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -39,7 +40,10 @@ public class ManualDispenserActivity extends AppCompatActivity {
 
         /* Actualización de gramos por porción */
         // Cargar la cantidad de gramos por porción de la base de datos aquí ---------------------------------------------------------------
-        gramsPerPortion = 50; // Se obtiene de la configuración de la base de datos
+        //gramsPerPortion = 50; // Se obtiene de la configuración de la base de datos
+        // Por el momento usamos un valor fijo
+        SharedPreferences sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE);
+        gramsPerPortion = sharedPreferences.getInt("gramsPerPortion", 0);
 
         /* Selección de porciones */
         RadioGroup radioGroup = findViewById(R.id.radioGroup);
