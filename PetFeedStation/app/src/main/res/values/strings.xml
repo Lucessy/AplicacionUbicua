@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">PetFeed Station</string>
+    <string-array name="portion_array">
+        <item>1 porción</item>
+        <item>2 porciones</item>
+        <item>3 porciones</item>
+        <item>4 porciones</item>
+        <item>5 porciones</item>
+    </string-array>
+</resources>

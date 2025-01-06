@@ -1,0 +1,102 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Toolbar -->
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@drawable/toolbar"
+        android:padding="8dp">
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back_arrow"
+            android:background="@android:color/transparent"
+            android:layout_alignParentStart="true"/>
+    </RelativeLayout>
+
+    <!-- Grams per Portion -->
+    <TextView
+        android:id="@+id/label_grams_per_portion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gramos por porción"
+        android:textSize="20dp"
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"/>
+
+    <EditText
+        android:id="@+id/edit_grams_per_portion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@id/label_grams_per_portion"
+        android:layout_margin="16dp"/>
+
+    <!-- Schedule Type -->
+    <TextView
+        android:id="@+id/label_schedule_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipo de horario"
+        android:textSize="20dp"
+        android:layout_below="@id/edit_grams_per_portion"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/radio_group_schedule_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/label_schedule_type"
+        android:layout_margin="16dp">
+
+        <RadioButton
+            android:id="@+id/radio_24h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="24h"/>
+
+        <RadioButton
+            android:id="@+id/radio_12h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12h"/>
+    </RadioGroup>
+
+    <!-- Maximum Portions -->
+    <TextView
+        android:id="@+id/label_max_portions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Número máximo de porciones"
+        android:textSize="20dp"
+        android:layout_below="@id/radio_group_schedule_type"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"/>
+
+    <EditText
+        android:id="@+id/edit_max_portions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@id/label_max_portions"
+        android:layout_margin="16dp"/>
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/button_save_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Guardar"
+        android:layout_below="@id/edit_max_portions"
+        android:backgroundTint="@color/selectedColor"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+</RelativeLayout>

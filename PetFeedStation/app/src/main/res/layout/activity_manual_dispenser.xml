@@ -1,0 +1,144 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Toolbar -->
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@drawable/toolbar"
+        android:padding="8dp">
+
+        <!-- Texto del dispensador -->
+        <TextView
+            android:id="@+id/dispenser_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="Dispensador Manual"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_back_arrow" />
+    </RelativeLayout>
+
+    <!-- Botones de control del dispensador -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="50dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Comida restante en el dispensador:"
+            android:textSize="18sp"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/food_remaining"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0 gramos"
+            android:textSize="16sp"
+            android:gravity="center"/>
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:src="@drawable/img_food" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/radioGroup">
+
+            <RadioButton
+                android:id="@+id/button_portion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dispensar porciones"
+                android:textSize="18sp"/>
+
+            <LinearLayout
+                android:id="@+id/portion_selection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <Spinner
+                    android:id="@+id/spinner_portions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/portion_array" />
+
+                <TextView
+                    android:id="@+id/portion_grams"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="0 gramos"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <RadioButton
+                android:id="@+id/button_custom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dispensar manualmente"
+                android:textSize="18sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/editText_grams"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.4"
+                    android:inputType="number"
+                    android:hint="Ingrese gramos"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.6"
+                    android:text="gramos"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+        </RadioGroup>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button_dispense"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/selectedColor"
+        android:layout_alignParentBottom="true"
+        android:text="¡Dispensar comida!"
+        android:textSize="18sp"
+        android:layout_margin="18dp" />
+
+</RelativeLayout>
