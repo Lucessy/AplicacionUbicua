@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -17,10 +18,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.uah.petfeedstation.data.Meal;
+
 import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class AutoDispenserActivity extends AppCompatActivity {
@@ -28,6 +33,10 @@ public class AutoDispenserActivity extends AppCompatActivity {
     private int numTotalMeals = 0; // Número total de comidas
     private int numTotalPortions = 0; // Número de porciones
     private int gramsPerPortion = 0; // Gramos por porción
+
+    //Lista temporal para simular que se guardan los datos
+    private List<Meal> meals = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,8 +54,8 @@ public class AutoDispenserActivity extends AppCompatActivity {
         /* Actualizar valores */
         // Obtener los valores de la base de datos aquí ---------------------------------------------------------------
         gramsPerPortion = 50; // Gramos por porción
-        numTotalMeals = 3; // Número total de comidas
-        numTotalPortions = 5; // Número de porciones
+        numTotalMeals = 0; // Número total de comidas
+        numTotalPortions = 0; // Número de porciones
 
         // Actualizar los TextViews con los valores obtenidos
         TextView numMealsTextView = findViewById(R.id.num_meals_total);
@@ -58,6 +67,10 @@ public class AutoDispenserActivity extends AppCompatActivity {
         TextView gramsPerPortionTextView = findViewById(R.id.num_total_grams);
         gramsPerPortionTextView.setText(String.valueOf(gramsPerPortion * numTotalPortions));
 
+        /* Actualizar valores ya existentes de las comidas */
+        // Obtener los valores de la base de datos aquí ---------------------------------------------------------------
+        loadMealsFromDatabase();
+
         /* Botón de guardar */
         Button buttonSave = findViewById(R.id.button_save);
         buttonSave.setOnClickListener(new View.OnClickListener() {
@@ -66,12 +79,12 @@ public class AutoDispenserActivity extends AppCompatActivity {
                 // Mostrar el popup
                 Toast.makeText(AutoDispenserActivity.this, "Cambios guardados", Toast.LENGTH_SHORT).show();
 
-                // GUARDAR LOS CAMBIOS AQUI Y ENVIARLOS AL ARDUINO ---------------------------------------------------------------
+                // Enviar datos a la base de datos  ---------------------------------------------------------------
+                saveMealsToDatabase();
 
-                // Volver a la pantalla activity_main
+                // Mover la actividad a segundo plano en lugar de finalizarla
                 Intent intent = new Intent(AutoDispenserActivity.this, MainMenuActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
 
@@ -93,8 +106,12 @@ public class AutoDispenserActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Add a new meal entry with default values
-                addMealEntry("08:00", "1");
+                if (getNumTotalMeals() < 10) {
+                    // Add a new meal entry with default values
+                    addMealEntry("08:00", "1");
+                } else {
+                    Toast.makeText(AutoDispenserActivity.this, "No se pueden añadir más de 10 comidas", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -151,15 +168,31 @@ public class AutoDispenserActivity extends AppCompatActivity {
         builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Get the user input
+                // Obtener valores del usuario
                 String newTime = editTime.getText().toString();
                 String newPortions = editPortions.getText().toString();
 
-                // Update the meal entry
+                if (Integer.parseInt(newPortions) > 10) {
+                    Toast.makeText(AutoDispenserActivity.this, "No se pueden añadir más de 10 porciones", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Actualizar los valores de la comida
                 TextView timeTextView = mealEntryView.findViewById(R.id.time);
                 TextView portionsTextView = mealEntryView.findViewById(R.id.num_portions);
                 timeTextView.setText(newTime);
                 portionsTextView.setText(newPortions + " porciones");
+
+                // Actualizar la lista de comidas
+                for (Meal meal : meals) {
+                    if (meal.getTime().equals(currentTime) && meal.getPortions().equals(currentPortions)) {
+                        meal.setTime(newTime);
+                        meal.setPortions(newPortions);
+                        break;
+                    }
+                }
+
+                updateTotalValues();
             }
         });
 
@@ -170,6 +203,11 @@ public class AutoDispenserActivity extends AppCompatActivity {
     }
 
     private void addMealEntry(String time, String portions) {
+        if (Integer.parseInt(portions) > 10) {
+            Toast.makeText(AutoDispenserActivity.this, "No se pueden añadir más de 10 porciones", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         LinearLayout scrollViewLayout = findViewById(R.id.scroll_view_layout);
 
         // Inflate the new meal entry layout
@@ -187,7 +225,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showEditMealDialog(newMealEntry, time, portions);
+                showEditMealDialog(newMealEntry, timeTextView.getText().toString(), portionsTextView.getText().toString().split(" ")[0]);
             }
         });
 
@@ -197,10 +235,70 @@ public class AutoDispenserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 scrollViewLayout.removeView(newMealEntry);
+
+                Meal meal = new Meal(time, portions);
+                meals.remove(meal);
+
+                updateTotalValues();
             }
         });
 
         // Add the new meal entry to the scroll view layout
         scrollViewLayout.addView(newMealEntry);
+        meals.add(new Meal(time, portions));
+        updateTotalValues();
+    }
+
+    private void loadMealsFromDatabase() {
+        // Clear the existing views
+        LinearLayout scrollViewLayout = findViewById(R.id.scroll_view_layout);
+        scrollViewLayout.removeAllViews();
+
+        // Generate test data
+        List<Meal> loadedMeals = new ArrayList<>(meals);
+        meals.clear();
+
+        // Add meals to the list and update the UI
+        for (Meal meal : loadedMeals) {
+            addMealEntry(meal.getTime(), meal.getPortions());
+        }
+
+        updateTotalValues();
+    }
+
+    private void saveMealsToDatabase() {
+        //dbHelper.deleteAllMeals();
+        meals.clear();
+        LinearLayout scrollViewLayout = findViewById(R.id.scroll_view_layout);
+        for (int i = 0; i < scrollViewLayout.getChildCount(); i++) {
+            View mealEntryView = scrollViewLayout.getChildAt(i);
+            TextView timeTextView = mealEntryView.findViewById(R.id.time);
+            TextView portionsTextView = mealEntryView.findViewById(R.id.num_portions);
+            String time = timeTextView.getText().toString();
+            String portions = portionsTextView.getText().toString().split(" ")[0];
+            Meal meal = new Meal(time, portions);
+            //dbHelper.addMeal(meal);
+            meals.add(meal);
+        }
+    }
+
+    private void updateTotalValues() {
+        numTotalMeals = meals.size();
+        numTotalPortions = 0;
+        for (Meal meal : meals) {
+            numTotalPortions += Integer.parseInt(meal.getPortions());
+        }
+        TextView numMealsTextView = findViewById(R.id.num_meals_total);
+        numMealsTextView.setText(String.valueOf(numTotalMeals));
+
+        TextView numPortionsTextView = findViewById(R.id.num_portions_total);
+        numPortionsTextView.setText(String.valueOf(numTotalPortions));
+
+        TextView gramsPerPortionTextView = findViewById(R.id.num_total_grams);
+        gramsPerPortionTextView.setText(String.valueOf(gramsPerPortion * numTotalPortions));
+    }
+
+    private int getNumTotalMeals() {
+        return meals.size();
     }
 }
