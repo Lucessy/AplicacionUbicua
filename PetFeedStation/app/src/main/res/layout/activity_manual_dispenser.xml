@@ -18,9 +18,9 @@
             android:layout_centerInParent="true"
             android:gravity="center"
             android:text="Dispensador Manual"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textSize="18sp" />
+            android:textSize="24sp" />
 
         <ImageButton
             android:id="@+id/back_button"
@@ -46,7 +46,8 @@
             android:layout_height="wrap_content"
             android:text="Comida restante en el dispensador:"
             android:textSize="18sp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:background="@color/lightGray"/>
 
         <TextView
             android:id="@+id/food_remaining"
@@ -102,9 +103,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Dispensar manualmente"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
 
             <LinearLayout
+                android:id="@+id/portion_custom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -123,7 +125,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.6"
-                    android:text="gramos"
+                    android:text="gramo/s"
                     android:layout_gravity="center"
                     android:layout_marginStart="8dp"
                     android:textSize="16sp"/>

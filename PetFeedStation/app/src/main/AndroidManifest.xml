@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainMenuActivity" />
         <activity android:name=".AutoDispenserActivity" />
         <activity android:name=".ManualDispenserActivity" />
         <activity android:name=".SettingsActivity" />
