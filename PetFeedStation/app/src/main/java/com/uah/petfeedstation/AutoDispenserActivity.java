@@ -1,7 +1,11 @@
+// AutoDispenserActivity.java
 package com.uah.petfeedstation;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,6 +40,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
     private int gramsPerPortion = 0; // Gramos por porción
 
     private List<Meal> meals = new ArrayList<>();
+    private List<Meal> tempMeals = new ArrayList<>();
     private String currentID = "";
     private String ipVirtualMachine = "";
     private SaveSettingsActivity saveSettingsActivity;
@@ -64,6 +69,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
         /* Actualizar valores ya existentes de las comidas */
         saveMealsActivity = new SaveMealsActivity(this);
         meals = saveMealsActivity.getMeals();
+        tempMeals = new ArrayList<>(meals);
 
         if (meals.isEmpty()) {
             setDefaultMeals();
@@ -79,7 +85,20 @@ public class AutoDispenserActivity extends AppCompatActivity {
                 // Mostrar el popup
                 Toast.makeText(AutoDispenserActivity.this, "Cambios guardados", Toast.LENGTH_SHORT).show();
 
+                // Borrar las alarmas existentes
+                String topic = "est" + currentID + "/dispensar";
+                for (Meal meal : meals) {
+                    String payload = String.valueOf(Integer.parseInt(meal.getPortions()) * gramsPerPortion);
+                    ScheduleManager.cancelFeeding(AutoDispenserActivity.this, topic, payload);
+                }
+
+                meals = new ArrayList<>(tempMeals);
                 saveMealsActivity.saveMeals(meals);
+
+                // Schedule alarms for each meal
+                for (Meal meal : meals) {
+                    scheduleAlarm(meal.getTime(), meal.getPortions());
+                }
 
                 // Mover la actividad a segundo plano en lugar de finalizarla
                 Intent intent = new Intent(AutoDispenserActivity.this, MainMenuActivity.class);
@@ -92,7 +111,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (meals.size() < 10) {
+                if (tempMeals.size() < 10) {
                     // Add a new meal entry with default values
                     addMealEntry("08:00", "1");
                 } else {
@@ -106,7 +125,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Volver a la pantalla activity_main
+                // Volver a la pantalla activity_main sin guardar cambios
                 Intent intent = new Intent(AutoDispenserActivity.this, MainMenuActivity.class);
                 startActivity(intent);
                 finish();
@@ -163,6 +182,16 @@ public class AutoDispenserActivity extends AppCompatActivity {
                     return;
                 }
 
+                if (newPortions.isEmpty()) {
+                    Toast.makeText(AutoDispenserActivity.this, "Por favor, ingrese un número de porciones", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!newTime.equals(currentTime) && isDuplicateMealTime(newTime)) {
+                    Toast.makeText(AutoDispenserActivity.this, "Ya existe una comida programada a esta hora", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 // Actualizar los valores de la comida
                 TextView timeTextView = mealEntryView.findViewById(R.id.time);
                 TextView portionsTextView = mealEntryView.findViewById(R.id.num_portions);
@@ -170,7 +199,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
                 portionsTextView.setText(newPortions + " porciones");
 
                 // Actualizar la lista de comidas
-                for (Meal meal : meals) {
+                for (Meal meal : tempMeals) {
                     if (meal.getTime().equals(currentTime) && meal.getPortions().equals(currentPortions)) {
                         meal.setTime(newTime);
                         meal.setPortions(newPortions);
@@ -191,6 +220,11 @@ public class AutoDispenserActivity extends AppCompatActivity {
     private void addMealEntry(String time, String portions) {
         if (Integer.parseInt(portions) > 10) {
             Toast.makeText(AutoDispenserActivity.this, "No se pueden añadir más de 10 porciones", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (isDuplicateMealTime(time)) {
+            Toast.makeText(AutoDispenserActivity.this, "Ya existe una comida programada a esta hora", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -223,7 +257,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
                 scrollViewLayout.removeView(newMealEntry);
 
                 Meal meal = new Meal(timeTextView.getText().toString(), portionsTextView.getText().toString().split(" ")[0]);
-                meals.remove(meal);
+                tempMeals.remove(meal);
 
                 updateTotalValues();
             }
@@ -231,8 +265,26 @@ public class AutoDispenserActivity extends AppCompatActivity {
 
         // Add the new meal entry to the scroll view layout
         scrollViewLayout.addView(newMealEntry);
-        meals.add(new Meal(time, portions));
+        tempMeals.add(new Meal(time, portions));
         updateTotalValues();
+    }
+
+    private void scheduleAlarm(String time, String portions) {
+        // Convert the provided time to hours and minutes
+        String[] timeParts = time.split(":");
+        int hour = Integer.parseInt(timeParts[0]);
+        int minute = Integer.parseInt(timeParts[1]);
+
+        // Set the feeding time
+        Calendar feedingTime = Calendar.getInstance();
+        feedingTime.set(Calendar.HOUR_OF_DAY, hour);
+        feedingTime.set(Calendar.MINUTE, minute);
+        feedingTime.set(Calendar.SECOND, 0);
+
+        String topic = "est" + currentID + "/dispensar";
+        String payload = String.valueOf(Integer.parseInt(portions) * gramsPerPortion);
+
+        ScheduleManager.scheduleFeeding(this, feedingTime, topic, payload);
     }
 
     private void loadMealsFromDatabase() {
@@ -241,8 +293,8 @@ public class AutoDispenserActivity extends AppCompatActivity {
         scrollViewLayout.removeAllViews();
 
         // Generate test data
-        List<Meal> loadedMeals = new ArrayList<>(meals);
-        meals.clear();
+        List<Meal> loadedMeals = new ArrayList<>(tempMeals);
+        tempMeals.clear();
 
         // Add meals to the list and update the UI
         for (Meal meal : loadedMeals) {
@@ -253,12 +305,13 @@ public class AutoDispenserActivity extends AppCompatActivity {
     }
 
     private void updateTotalValues() {
-        numTotalMeals = meals.size();
+        numTotalMeals = tempMeals.size();
         numTotalPortions = 0;
 
-        for (Meal meal : meals) {
+        for (Meal meal : tempMeals) {
             numTotalPortions += Integer.parseInt(meal.getPortions());
         }
+
         TextView numMealsTextView = findViewById(R.id.num_meals_total);
         numMealsTextView.setText(String.valueOf(numTotalMeals));
 
@@ -270,9 +323,23 @@ public class AutoDispenserActivity extends AppCompatActivity {
     }
 
     private void setDefaultMeals() {
-        meals.add(new Meal("08:00", "1"));
-        meals.add(new Meal("12:00", "1"));
-        meals.add(new Meal("18:00", "1"));
-        saveMealsActivity.saveMeals(meals);
+        tempMeals.add(new Meal("08:00", "1"));
+        tempMeals.add(new Meal("12:00", "1"));
+        tempMeals.add(new Meal("18:00", "1"));
+        saveMealsActivity.saveMeals(tempMeals);
+
+        // Schedule default alarms
+        for (Meal meal : tempMeals) {
+            scheduleAlarm(meal.getTime(), meal.getPortions());
+        }
+    }
+
+    private boolean isDuplicateMealTime(String time) {
+        for (Meal meal : tempMeals) {
+            if (meal.getTime().equals(time)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
