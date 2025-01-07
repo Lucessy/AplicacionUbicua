@@ -2,53 +2,60 @@
 package com.uah.petfeedstation;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import com.hivemq.client.mqtt.MqttClient;
+import com.hivemq.client.mqtt.MqttGlobalPublishFilter;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
+import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAck;
+import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import java.nio.charset.StandardCharsets;
 
 public class Dispenser {
-    private MqttAndroidClient client;
     private static final String TAG = "Dispenser";
+    private Mqtt3AsyncClient client;
 
-    public Dispenser(Context context, String serverUri, String username, String password) {
-        String clientId = MqttClient.generateClientId();
-        client = new MqttAndroidClient(context, serverUri, clientId);
+    public Dispenser(Context context, String serverUri, String username, String password, String topic, String payload) {
+        Log.i(TAG, "La ip es esta:"+serverUri.split(":")[1].substring(2));
+        client = MqttClient.builder()
+                .useMqttVersion3()
+                .serverHost(serverUri.split(":")[1].substring(2))
+                .serverPort(Integer.parseInt(serverUri.split(":")[2]))
+                .buildAsync();
 
-        try {
-            MqttConnectOptions options = new MqttConnectOptions();
-            options.setUserName(username);
-            options.setPassword(password.toCharArray());
-            IMqttToken token = client.connect(options);
-            token.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.i(TAG, "MQTT connected");
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.i(TAG, "Error connecting MQTT: " + exception);
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            client.connectWith()
+                    .simpleAuth()
+                    .username(username)
+                    .password(password.getBytes(StandardCharsets.UTF_8))
+                    .applySimpleAuth()
+                    .send()
+                    .whenComplete((connAck, throwable) -> {
+                        if (throwable != null) {
+                            Log.e(TAG, "Error connecting to MQTT broker", throwable);
+                        } else {
+                            Log.i(TAG, "Connected to MQTT broker: " + connAck);
+                            dispenseFood(topic, payload);
+                        }
+                    });
         }
     }
 
     public void dispenseFood(String topic, String payload) {
-        try {
-            MqttMessage message = new MqttMessage(payload.getBytes("UTF-8"));
-            client.publish(topic, message);
-        } catch (Exception e) {
-            Log.e(TAG, "Error publishing MQTT message: " + e);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            client.publishWith()
+                    .topic(topic)
+                    .payload(payload.getBytes(StandardCharsets.UTF_8))
+                    .send()
+                    .whenComplete((publishResult, throwable) -> {
+                        if (throwable != null) {
+                            Log.e(TAG, "Error publishing message", throwable);
+                        } else {
+                            Log.i(TAG, "Message published to topic: " + topic);
+                        }
+                    });
         }
     }
 }

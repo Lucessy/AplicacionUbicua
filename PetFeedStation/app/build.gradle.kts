@@ -34,6 +34,19 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+        packaging {
+            resources {
+                excludes.add("META-INF/INDEX.LIST")
+                excludes.add("META-INF/*.SF")
+                excludes.add("META-INF/*.DSA")
+                excludes.add("META-INF/*.RSA")
+                excludes.add("META-INF/io.netty.versions.properties")
+
+            }
+        }
+
+
 }
 
 dependencies {
@@ -44,8 +57,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
-    implementation("org.eclipse.paho:org.eclipse.paho.android.service:1.1.1")
-    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.0.0")
+    implementation(libs.mpandroidchart)
+    implementation(libs.org.eclipse.paho.client.mqttv3)
+    implementation(libs.org.eclipse.paho.android.service)
+    implementation(libs.localbroadcastmanager)
+    implementation (libs.hivemq.mqtt.client)
 }
