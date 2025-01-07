@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -18,39 +19,53 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.mikephil.charting.data.Entry;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Locale;
+
 public class ManualDispenserActivity extends AppCompatActivity {
 
-    private int foodRemaining = 0;
+    private int foodRemainingBowl = 0;
     private int gramsToSend = 0;
     private int gramsPerPortion = 0;
+    private float percentageFoodRemaining = 0;
+    private SaveSettingsActivity saveSettingsActivity;
+    private String currentID = "";
+    private String ipVirtualMachine = "";
+    private String tag = "ManualDispenserActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual_dispenser);
 
+        /* Recuperar el registerID de la actividad anterior */
+        currentID = getIntent().getStringExtra("registerID");
+        ipVirtualMachine = getIntent().getStringExtra("ipVirtualMachine");
+
         /* Botón de retroceso */
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
 
         /* Cantidad de comida restante */
-        // Cargar la cantidad de comida restante de la base de datos aquí ---------------------------------------------------------------
-        TextView foodRemainingTextView = findViewById(R.id.food_remaining);
-        foodRemainingTextView.setText(foodRemaining + " gramos");
+        loadFoodRemaining();
+        updateFoodRemaining();
 
         /* Actualización de gramos por porción */
-        // Cargar la cantidad de gramos por porción de la base de datos aquí ---------------------------------------------------------------
-        //gramsPerPortion = 50; // Se obtiene de la configuración de la base de datos
-        // Por el momento usamos un valor fijo
-        SharedPreferences sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE);
-        gramsPerPortion = sharedPreferences.getInt("gramsPerPortion", 0);
+        saveSettingsActivity = new SaveSettingsActivity(this);
+        // Recuperar una configuración
+        gramsPerPortion = Integer.parseInt(saveSettingsActivity.getSetting("gramsPerPortion"));
 
         /* Selección de porciones */
         RadioGroup radioGroup = findViewById(R.id.radioGroup);
-
         LinearLayout portionCustom = findViewById(R.id.portion_custom);
         EditText editTextGrams = findViewById(R.id.editText_grams);
-
         LinearLayout portionSelection = findViewById(R.id.portion_selection);
         Spinner spinnerPortions = findViewById(R.id.spinner_portions);
         TextView portionGrams = findViewById(R.id.portion_grams);
@@ -96,10 +111,10 @@ public class ManualDispenserActivity extends AppCompatActivity {
                         throw new NumberFormatException();
                     } else
 
-                    if (gramsToDispense > foodRemaining) {
+                    if (percentageFoodRemaining == 0) {
                         new AlertDialog.Builder(ManualDispenserActivity.this)
                                 .setTitle("Error")
-                                .setMessage("No hay suficiente comida en el tanque para dispensar " + gramsToDispense + " gramos.")
+                                .setMessage("No hay suficiente comida en el tanque para dispensar ")
                                 .setPositiveButton("OK", null)
                                 .show();
                     } else {
@@ -110,7 +125,7 @@ public class ManualDispenserActivity extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         // Volver a la pantalla activity_main
-                                        gramsToSend = gramsToDispense;
+                                        //gramsToSend = gramsToDispense;
                                         // Actualizar y enviar la cantidad de comida restante en la base de datos aquí ---------------------------------------------------------------
 
                                         Intent intent = new Intent(ManualDispenserActivity.this, MainActivity.class);
@@ -131,5 +146,33 @@ public class ManualDispenserActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void updateFoodRemaining() {
+        TextView foodRemainingTextView = findViewById(R.id.food_remaining);
+        foodRemainingTextView.setText(percentageFoodRemaining + " %");
+
+        TextView foodRemainingBowlTextView = findViewById(R.id.food_remaining_bowl);
+        foodRemainingBowlTextView.setText(foodRemainingBowl + " gramos");
+    }
+
+    private void loadFoodRemaining() {
+        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetEstacionComida" + "?=id" + currentID;
+        ServerConnectionThread thread = new ServerConnectionThread(this, url);
+        try {
+            thread.join();
+        }catch (InterruptedException e){}
+    }
+
+    public void setFoodRemaining(JSONArray jsonArray) {
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonobject = jsonArray.getJSONObject(i);
+                foodRemainingBowl = jsonobject.getInt("peso");
+                percentageFoodRemaining = (float) jsonobject.getDouble("distancia");
+            }
+        } catch (Exception e) {
+            Log.e(tag, "Error: " + e);
+        }
     }
 }

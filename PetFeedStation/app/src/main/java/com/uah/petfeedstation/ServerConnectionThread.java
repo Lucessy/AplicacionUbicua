@@ -1,5 +1,7 @@
+// ServerConnectionThread.java
 package com.uah.petfeedstation;
 
+import android.app.Activity;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -13,59 +15,59 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class ServerConnectionThread extends Thread{
-    private MainActivity activity;
-    private String tag = "MainActivity";
+class ServerConnectionThread extends Thread {
+    private Activity activity;
+    private String tag = "ServerConnectionThread";
     private String urlStr = "";
 
-    public ServerConnectionThread(MainActivity activ, String url)    {
-        activity = activ;
-        urlStr = url;
+    public ServerConnectionThread(Activity activity, String url) {
+        this.activity = activity;
+        this.urlStr = url;
         Log.i(tag, "ServerConnectionThread started");
         start();
     }
 
     @Override
-    public void run()    {
+    public void run() {
         String response = "";
         try {
             URL url = new URL(urlStr);
-            HttpURLConnection urlConnection = null;
-            urlConnection = (HttpURLConnection) url.openConnection();
-            //Get the information from the url
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             response = convertStreamToString(in);
             Log.d(tag, "get json: " + response);
             JSONArray jsonarray = new JSONArray(response);
-            activity.onServerResponse(jsonarray);
 
-            /*
-            //Read Responses and fill the spinner
-            if(urlStr.contains("GetPetWeight")){
-                Log.e("Weight", "weight");
-                activity.setEntriesPetWeight(jsonarray);
-            }else if (urlStr.contains("GetPetMeals")){
-                Log.e("Meals", "meals");
-                activity.setEntriesMeals(jsonarray);
-            }else if (urlStr.contains("GetPetHistory")){
-                Log.e("History", "history");
-                activity.setEntriesHistory(jsonarray);
-            }else if (urlStr.contains("GetPetSettings")){
-                Log.e("Settings", "settings");
-                activity.setEntriesSettings(jsonarray);
-            }*/
-        }
-        catch (IOException | JSONException e) {
+            /* Main Activity */
+            if (activity instanceof MainActivity) {
+                ((MainActivity) activity).onServerResponse(jsonarray);
+
+            } /* Main Menu Activity */
+            else if (activity instanceof MainMenuActivity) {
+
+                if (urlStr.contains("GetHistorialDispensacionID")) {
+                    ((MainMenuActivity) activity).setDispensedFood(jsonarray);
+                } else if (urlStr.contains("GetHistorialPesoID")) {
+                    ((MainMenuActivity) activity).setEntriesPetWeight(jsonarray);
+                }else if (urlStr.contains("GetEstacionComida")) {
+                    ((MainMenuActivity) activity).setFoodRemaining(jsonarray);
+                }
+
+            } /* Manual Dispenser Activity */
+            else if (activity instanceof ManualDispenserActivity) {
+                ((ManualDispenserActivity) activity).setFoodRemaining(jsonarray);
+            } /* Automatic Dispenser Activity */
+
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
             Log.e(tag, "Error: " + e.getMessage());
         }
     }
-    //Get the input strean and convert into String
+
     private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
-
-        String line = null;
+        String line;
         try {
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append('\n');
@@ -82,7 +84,3 @@ class ServerConnectionThread extends Thread{
         return sb.toString();
     }
 }
-
-
-
-

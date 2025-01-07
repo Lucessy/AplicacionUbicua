@@ -35,43 +35,40 @@ public class AutoDispenserActivity extends AppCompatActivity {
     private int numTotalPortions = 0; // Número de porciones
     private int gramsPerPortion = 0; // Gramos por porción
 
-    //Lista temporal para simular que se guardan los datos
     private List<Meal> meals = new ArrayList<>();
+    private String currentID = "";
+    private String ipVirtualMachine = "";
+    private SaveSettingsActivity saveSettingsActivity;
+    private SaveMealsActivity saveMealsActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auto_dispenser);
 
+        /* Recuperar el registerID de la actividad anterior */
+        currentID = getIntent().getStringExtra("registerID");
+        ipVirtualMachine = getIntent().getStringExtra("ipVirtualMachine");
+
         /* Titulo de la barra de herramientas */
-        // Obtener el nombre del día actual
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE", new Locale("es", "ES"));
         String dayName = dateFormat.format(calendar.getTime());
-        // Actualizar el TextView con el nombre del día
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText("Plan del " + dayName);
 
-        /* Actualizar valores */
-        // Obtener los valores de la base de datos aquí ---------------------------------------------------------------
-        //gramsPerPortion = 50; // Gramos por porción
-        numTotalMeals = 0; // Número total de comidas
-        numTotalPortions = 0; // Número de porciones
-        SharedPreferences sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE);
-        gramsPerPortion = sharedPreferences.getInt("gramsPerPortion", 0);
-
-        // Actualizar los TextViews con los valores obtenidos
-        TextView numMealsTextView = findViewById(R.id.num_meals_total);
-        numMealsTextView.setText(String.valueOf(numTotalMeals));
-
-        TextView numPortionsTextView = findViewById(R.id.num_portions_total);
-        numPortionsTextView.setText(String.valueOf(numTotalPortions));
-
-        TextView gramsPerPortionTextView = findViewById(R.id.num_total_grams);
-        gramsPerPortionTextView.setText(String.valueOf(gramsPerPortion * numTotalPortions));
+        /* Actualización de gramos por porción */
+        saveSettingsActivity = new SaveSettingsActivity(this);
+        gramsPerPortion = Integer.parseInt(saveSettingsActivity.getSetting("gramsPerPortion"));
 
         /* Actualizar valores ya existentes de las comidas */
-        // Obtener los valores de la base de datos aquí ---------------------------------------------------------------
+        saveMealsActivity = new SaveMealsActivity(this);
+        meals = saveMealsActivity.getMeals();
+
+        if (meals.isEmpty()) {
+            setDefaultMeals();
+        }
+
         loadMealsFromDatabase();
 
         /* Botón de guardar */
@@ -82,24 +79,10 @@ public class AutoDispenserActivity extends AppCompatActivity {
                 // Mostrar el popup
                 Toast.makeText(AutoDispenserActivity.this, "Cambios guardados", Toast.LENGTH_SHORT).show();
 
-                // Enviar datos a la base de datos  ---------------------------------------------------------------
-                saveMealsToDatabase();
+                saveMealsActivity.saveMeals(meals);
 
                 // Mover la actividad a segundo plano en lugar de finalizarla
                 Intent intent = new Intent(AutoDispenserActivity.this, MainMenuActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        /* Botón de ver calendario POR VERIFICAR SI ES NECESARIO */
-        Button buttonViewCalendar = findViewById(R.id.button_view_calendar);
-        buttonViewCalendar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Open the calendar and select a date
-                Calendar selectedDate = Calendar.getInstance(); // Replace with actual date selection logic
-                Intent intent = new Intent(AutoDispenserActivity.this, ViewPlanActivity.class);
-                intent.putExtra("selectedDate", selectedDate.getTimeInMillis());
                 startActivity(intent);
             }
         });
@@ -109,7 +92,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getNumTotalMeals() < 10) {
+                if (meals.size() < 10) {
                     // Add a new meal entry with default values
                     addMealEntry("08:00", "1");
                 } else {
@@ -269,25 +252,10 @@ public class AutoDispenserActivity extends AppCompatActivity {
         updateTotalValues();
     }
 
-    private void saveMealsToDatabase() {
-        //dbHelper.deleteAllMeals();
-        meals.clear();
-        LinearLayout scrollViewLayout = findViewById(R.id.scroll_view_layout);
-        for (int i = 0; i < scrollViewLayout.getChildCount(); i++) {
-            View mealEntryView = scrollViewLayout.getChildAt(i);
-            TextView timeTextView = mealEntryView.findViewById(R.id.time);
-            TextView portionsTextView = mealEntryView.findViewById(R.id.num_portions);
-            String time = timeTextView.getText().toString();
-            String portions = portionsTextView.getText().toString().split(" ")[0];
-            Meal meal = new Meal(time, portions);
-            //dbHelper.addMeal(meal);
-            meals.add(meal);
-        }
-    }
-
     private void updateTotalValues() {
         numTotalMeals = meals.size();
         numTotalPortions = 0;
+
         for (Meal meal : meals) {
             numTotalPortions += Integer.parseInt(meal.getPortions());
         }
@@ -301,7 +269,10 @@ public class AutoDispenserActivity extends AppCompatActivity {
         gramsPerPortionTextView.setText(String.valueOf(gramsPerPortion * numTotalPortions));
     }
 
-    private int getNumTotalMeals() {
-        return meals.size();
+    private void setDefaultMeals() {
+        meals.add(new Meal("08:00", "1"));
+        meals.add(new Meal("12:00", "1"));
+        meals.add(new Meal("18:00", "1"));
+        saveMealsActivity.saveMeals(meals);
     }
 }

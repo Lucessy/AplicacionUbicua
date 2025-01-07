@@ -2,6 +2,8 @@ package com.uah.petfeedstation;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private void verifyUser() {
         // Verificar si el usuario está registrado
         Log.i(tag, "Verifying user...");
-        String url = "http://" + this.ipVirtualMachine + ":8080/EstacionComidaServer/ComprobarID?id=" + this.registerID;
+        String url = "http://" + this.ipVirtualMachine + ":8080/EstacionComidaServer/ComprobarId" + "?id=" + this.registerID;
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
@@ -73,10 +75,14 @@ public class MainActivity extends AppCompatActivity {
         Log.i(tag, "User registered: " + userRegistered);
         if (userRegistered.equals("true")) {
             Intent intent = new Intent(MainActivity.this, MainMenuActivity.class);
+            intent.putExtra("registerID", this.registerID); // Enviar el registerID a la siguiente actividad
+            intent.putExtra("ipVirtualMachine", this.ipVirtualMachine); // Enviar la IP de la máquina virtual
             startActivity(intent);
         } else {
             // Mostrar mensaje de error
-            Toast.makeText(MainActivity.this, "El ID no está registrado", Toast.LENGTH_LONG).show();
+            new Handler(Looper.getMainLooper()).post(() -> {
+                Toast.makeText(MainActivity.this, "Respuesta del servidor recibida", Toast.LENGTH_LONG).show();
+            });
         }
     }
 }

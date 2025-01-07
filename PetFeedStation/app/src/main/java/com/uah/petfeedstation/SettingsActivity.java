@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SettingsActivity extends AppCompatActivity {
+    private SaveSettingsActivity saveSettingsActivity;
+    private int gramsPerPortion;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,36 +47,24 @@ public class SettingsActivity extends AppCompatActivity {
                     return;
                 }
 
-                // IMPLEMENTAR ESTRUCTURA DE DATOS PARA GUARDAR LOS AJUSTES ----------------------------------------------------------------------------
-                // Crear un diccionario para guardar los ajustes
-                Map<String, Integer> settings = new HashMap<>();
-                settings.put("gramsPerPortion", Integer.parseInt(gramsPerPortion));
+                // Guardar la configuración
+                saveSettingsActivity.saveSetting("gramsPerPortion", gramsPerPortion);
 
-                // Guardar los ajustes en SharedPreferences
-                SharedPreferences sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("gramsPerPortion", settings.get("gramsPerPortion"));
-                editor.apply();
-
-                // Save the configurations (you can use SharedPreferences or any other method)
-                // For demonstration, we will just show a Toast message
-                Toast.makeText(SettingsActivity.this, "Settings Saved:\nGrams per Portion: " + gramsPerPortion
+                Toast.makeText(SettingsActivity.this, "Configuración guardada:\nGramos por porción: " + gramsPerPortion
                         , Toast.LENGTH_LONG).show();
 
-                // Cerrar la actividad
                 finish();
             }
         });
     }
 
     private void loadSettings() {
-        // IMPLEMENTAR CARGA DE AJUSTES DE LA BASE DE DATOS ---------------------------------------------------------------------------------------
-        // Cargar los ajustes de la base de datos y mostrarlos en los EditText
-        SharedPreferences sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE);
-        int gramsPerPortion = sharedPreferences.getInt("gramsPerPortion", 0);
+        /* Actualización de gramos por porción */
+        saveSettingsActivity = new SaveSettingsActivity(this);
+        // Recuperar una configuración
+        gramsPerPortion = Integer.parseInt(saveSettingsActivity.getSetting("gramsPerPortion"));
 
         EditText editGramsPerPortion = findViewById(R.id.edit_grams_per_portion);
-
         editGramsPerPortion.setText(String.valueOf(gramsPerPortion));
     }
 }

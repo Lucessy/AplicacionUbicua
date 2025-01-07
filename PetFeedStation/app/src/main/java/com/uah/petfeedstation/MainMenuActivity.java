@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,14 +33,15 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainMenuActivity extends AppCompatActivity {
-    private RadioGroup toggleGroup;
-    private RadioButton autoDispenserRadio, manualDispenserRadio;
     private LineChart lineChart;
     private static final long BUTTON_DELAY = 1000; // 1 second delay
     private int dispensedFood = 0;
-    private int dispensedPortions = 0;
+    private float foodRemaining = 0;
     private List<Entry> entriesPetWeight;
     private String tag = "MainMenuActivity";
+    private String currentID = "";
+    private String ipVirtualMachine = "";
+    private SaveSettingsActivity saveSettingsActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,23 +49,34 @@ public class MainMenuActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main_menu);
 
+        /* Recuperar el registerID de la actividad anterior */
+        currentID = getIntent().getStringExtra("registerID");
+        ipVirtualMachine = getIntent().getStringExtra("ipVirtualMachine");
+
         /* Texto de bienvenida */
-        // Obtener el TextView
         TextView welcomeText = findViewById(R.id.welcome_text);
-
-        // Obtener la fecha actual con el día de la semana en español
         String currentDate = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("es", "ES")).format(new Date());
-
-        // Establecer el texto de bienvenida con la fecha
         welcomeText.setText("¡Hola, usuario!\nHoy es " + currentDate);
 
-        /* Comida dispensada */
-        // Cargar la cantidad de comida dispensada de la base de datos aquí ---------------------------------------------------------------
+        /* Guardar configuración del dispositivo */
+        saveSettingsActivity = new SaveSettingsActivity(this);
+        // Verificar si la configuración ya existe antes de guardarla
+        if (saveSettingsActivity.getSetting("gramsPerPortion") == null) {
+            saveSettingsActivity.saveSetting("gramsPerPortion", "25"); // Valor por defecto
+        }
+        // Recuperar una configuración
+        String value = saveSettingsActivity.getSetting("gramsPerPortion");
+        if (value != null) {
+            Toast.makeText(this, "Valor de configuración: " + value, Toast.LENGTH_LONG).show();
+        }
 
-        TextView foodDispensedText = findViewById(R.id.food_dispensed);
-        foodDispensedText.setText(dispensedFood + " gramos");
-        TextView foodPortionsText = findViewById(R.id.food_portions_dispensed);
-        foodPortionsText.setText(dispensedPortions + " porciones");
+        /* Comida dispensada */
+        loadDispensedFood();
+        updateDispensedFood();
+
+        /* Comida restante */
+        loadFoodRemaining();
+        updateFoodRemaining();
 
         /* Grafica del peso del animal */
         lineChart = findViewById(R.id.lineChart);
@@ -77,6 +90,10 @@ public class MainMenuActivity extends AppCompatActivity {
         autoDispenserButton.setOnClickListener(v -> {
             autoDispenserButton.setEnabled(false); // Disable the button
             Intent intent = new Intent(MainMenuActivity.this, AutoDispenserActivity.class);
+
+            intent.putExtra("registerID", currentID); // Enviar el registerID a la siguiente actividad
+            intent.putExtra("ipVirtualMachine", ipVirtualMachine); // Enviar la IP de la máquina virtual
+
             startActivity(intent);
             // Re-establecer el botón después de un retraso
             new Handler().postDelayed(() -> autoDispenserButton.setEnabled(true), BUTTON_DELAY);
@@ -85,6 +102,10 @@ public class MainMenuActivity extends AppCompatActivity {
         manualDispenserButton.setOnClickListener(v -> {
             manualDispenserButton.setEnabled(false); // Disable the button
             Intent intent = new Intent(MainMenuActivity.this, ManualDispenserActivity.class);
+
+            intent.putExtra("registerID", currentID); // Enviar el registerID a la siguiente actividad
+            intent.putExtra("ipVirtualMachine", ipVirtualMachine); // Enviar la IP de la máquina virtual
+
             startActivity(intent);
             // Re-establecer el botón después de un retraso
             new Handler().postDelayed(() -> manualDispenserButton.setEnabled(true), BUTTON_DELAY);
@@ -113,16 +134,10 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void loadChartData() {
-        // Cargar datos de la base de datos aquí -----------------------------------------------------------------------------------------------
-        //loadPetWeight();
+        loadPetWeight();
+        int sizeHistory = entriesPetWeight.size();
 
-        List<Entry> entries = new ArrayList<>();
-        // Ejemplo de datos ficticios
-        for (int i = 0; i < 30; i++) {
-            entries.add(new Entry(i, (float) (Math.random() * 10 + 50)));
-        }
-
-        LineDataSet dataSet = new LineDataSet(entriesPetWeight, "Peso en los últimos 30 días");
+        LineDataSet dataSet = new LineDataSet(entriesPetWeight, "Peso en los últimos " + sizeHistory + " días");
         LineData lineData = new LineData(dataSet);
         lineChart.setData(lineData);
         lineChart.invalidate(); // refresca la gráfica
@@ -130,91 +145,79 @@ public class MainMenuActivity extends AppCompatActivity {
         dataSet.setCircleColor(Color.parseColor("#FFA500")); // Establecer el color de los puntos a naranja
     }
 
-    //Busca la información del peso del animal y la recoje
     private void loadPetWeight(){
-        /*
-        String url = "http://192.168.1.21:8080/ServerExampleUbicomp/GetStationsCity?cityId=";
+        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetHistorialPesoID" + "?=id" + currentID;
         entriesPetWeight = new ArrayList<>();
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
         }catch (InterruptedException e){}
-
-         */
     }
 
-    //Select the Cities from JSON response
-    public void setEntriesPetWeight(JSONArray jsonCities){
+    public void setEntriesPetWeight(JSONArray jsonArray) {
         try {
-            for (int i = 0; i < jsonCities.length(); i++) {
-                JSONObject jsonobject = jsonCities.getJSONObject(i);
-                entriesPetWeight.add(new Entry(jsonobject.getInt("day"), jsonobject.getInt("weight")));
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy, h:mm:ss a", Locale.ENGLISH);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonobject = jsonArray.getJSONObject(i);
+                String dateStr = jsonobject.getString("fecha");
+                Date date = dateFormat.parse(dateStr);
+                int day = Integer.parseInt(new SimpleDateFormat("d", Locale.ENGLISH).format(date));
+                float value = (float) jsonobject.getDouble("valor");
+                entriesPetWeight.add(new Entry(day, value));
             }
-
-        }catch (Exception e){
-            Log.e(tag,"Error: " + e);
+        } catch (Exception e) {
+            Log.e(tag, "Error: " + e);
         }
     }
 
-    private void loadPetMeals() {
-        /*
-        String url = "http://..";
-        ServerConnectionThread thread = new ServerConnectionThread(this, url);
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-        }*/
-    }
-
-    public void setEntriesMeals(JSONArray jsonarray) {
-
-    }
-
-    private void loadPetHistory() {
-        /*
-        String url = "http://..";
+    private void loadDispensedFood() {
+        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetHistorialDispensacionID" + "?=id" + currentID;
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
         } catch (InterruptedException e) {
         }
-        */
-
     }
 
-    public void setEntriesHistory(JSONArray jsonarray) {
+    public void setDispensedFood(JSONArray jsonArray) {
         try {
-            for (int i = 0; i < jsonarray.length(); i++) {
-                JSONObject jsonobject = jsonarray.getJSONObject(i);
-                //entriesPetWeight.add(new Entry(jsonobject.getInt("day"), jsonobject.getInt("weight")));
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonobject = jsonArray.getJSONObject(i);
+                dispensedFood = jsonobject.getInt("valor");
             }
-
-        }catch (Exception e){
-            Log.e(tag,"Error: " + e);
+        } catch (Exception e) {
+            Log.e(tag, "Error: " + e);
         }
     }
 
-    private void loadPetSettings() {
-        /*
-        String url = "http://..";
+    private void updateDispensedFood() {
+        TextView foodDispensedText = findViewById(R.id.food_percentage);
+        foodDispensedText.setText(dispensedFood + " gramos");
+    }
+
+    private void loadFoodRemaining() {
+        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetEstacionComida" + "?=id" + currentID;
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
         } catch (InterruptedException e) {
         }
-
-         */
     }
 
-    public void setEntriesSettings(JSONArray jsonarray) {
+    public void setFoodRemaining(JSONArray jsonArray) {
         try {
-            for (int i = 0; i < jsonarray.length(); i++) {
-                JSONObject jsonobject = jsonarray.getJSONObject(i);
-                //entriesPetWeight.add(new Entry(jsonobject.getInt("day"), jsonobject.getInt("weight")));
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonobject = jsonArray.getJSONObject(i);
+                foodRemaining = jsonobject.getInt("distancia");
             }
-
-        }catch (Exception e){
-            Log.e(tag,"Error: " + e);
+        } catch (Exception e) {
+            Log.e(tag, "Error: " + e);
         }
     }
+
+    private void updateFoodRemaining() {
+        TextView foodRemainingText = findViewById(R.id.food_remaining);
+        foodRemainingText.setText(foodRemaining + " gramos");
+    }
+
 }

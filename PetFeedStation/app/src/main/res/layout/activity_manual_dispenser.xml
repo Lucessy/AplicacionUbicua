@@ -44,13 +44,29 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Comida restante en el dispensador:"
+            android:text="Porcentaje de comida en el dispensador:"
             android:textSize="18sp"
-            android:gravity="center"
+            android:gravity="left"
             android:background="@color/lightGray"/>
 
         <TextView
             android:id="@+id/food_remaining"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0 %"
+            android:textSize="16sp"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Comida restante en el cuenco:"
+            android:textSize="18sp"
+            android:gravity="left"
+            android:background="@color/lightGray"/>
+
+        <TextView
+            android:id="@+id/food_remaining_bowl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="0 gramos"
