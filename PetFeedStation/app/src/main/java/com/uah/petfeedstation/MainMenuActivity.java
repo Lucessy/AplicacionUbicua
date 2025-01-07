@@ -40,7 +40,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private List<Entry> entriesPetWeight;
     private String tag = "MainMenuActivity";
     private String currentID = "";
-    private String ipVirtualMachine = "";
+    private String ipVirtualMachine = "192.168.1.35";
     private SaveSettingsActivity saveSettingsActivity;
 
     @Override
@@ -50,8 +50,13 @@ public class MainMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
 
         /* Recuperar el registerID de la actividad anterior */
-        currentID = getIntent().getStringExtra("registerID");
-        ipVirtualMachine = getIntent().getStringExtra("ipVirtualMachine");
+        if (savedInstanceState != null) {
+            currentID = savedInstanceState.getString("currentID");
+            ipVirtualMachine = savedInstanceState.getString("ipVirtualMachine");
+        } else {
+            currentID = getIntent().getStringExtra("registerID");
+            ipVirtualMachine = getIntent().getStringExtra("ipVirtualMachine");
+        }
         Log.i(tag, ipVirtualMachine);
         /* Texto de bienvenida */
         TextView welcomeText = findViewById(R.id.welcome_text);
@@ -222,6 +227,13 @@ public class MainMenuActivity extends AppCompatActivity {
     private void updateFoodRemaining() {
         TextView foodRemainingText = findViewById(R.id.food_percentage);
         foodRemainingText.setText(foodRemaining + " %");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentID", currentID);
+        outState.putString("ipVirtualMachine", ipVirtualMachine);
     }
 
 }
