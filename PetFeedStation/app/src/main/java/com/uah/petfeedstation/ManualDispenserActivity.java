@@ -157,7 +157,7 @@ public class ManualDispenserActivity extends AppCompatActivity {
     }
 
     private void loadFoodRemaining() {
-        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetEstacionComida" + "?=id" + currentID;
+        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetEstacionComida" + "?id=" + currentID;
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();

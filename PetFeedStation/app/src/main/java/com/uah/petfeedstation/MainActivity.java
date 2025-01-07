@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private void verifyUser() {
         // Verificar si el usuario está registrado
         Log.i(tag, "Verifying user...");
-        String url = "http://" + this.ipVirtualMachine + ":8080/EstacionComidaServer/ComprobarId" + "?id=" + this.registerID;
+        String url = "http://" + this.ipVirtualMachine + ":8080/EstacionComidaServer/ComprobarID" + "?id=" + this.registerID;
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Mostrar mensaje de error
             new Handler(Looper.getMainLooper()).post(() -> {
-                Toast.makeText(MainActivity.this, "Respuesta del servidor recibida", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "El ID no es válido.", Toast.LENGTH_LONG).show();
             });
         }
     }

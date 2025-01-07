@@ -52,7 +52,7 @@ public class MainMenuActivity extends AppCompatActivity {
         /* Recuperar el registerID de la actividad anterior */
         currentID = getIntent().getStringExtra("registerID");
         ipVirtualMachine = getIntent().getStringExtra("ipVirtualMachine");
-
+        Log.i(tag, ipVirtualMachine);
         /* Texto de bienvenida */
         TextView welcomeText = findViewById(R.id.welcome_text);
         String currentDate = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("es", "ES")).format(new Date());
@@ -71,17 +71,20 @@ public class MainMenuActivity extends AppCompatActivity {
         }
 
         /* Comida dispensada */
+
         loadDispensedFood();
         updateDispensedFood();
 
         /* Comida restante */
         loadFoodRemaining();
+        Log.i(tag, "Prueba");
         updateFoodRemaining();
 
         /* Grafica del peso del animal */
         lineChart = findViewById(R.id.lineChart);
         setupLineChart();
         loadChartData();
+
 
         /* Botones de dispensador automático y manual */
         Button autoDispenserButton = findViewById(R.id.button_dispenser);
@@ -146,7 +149,7 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void loadPetWeight(){
-        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetHistorialPesoID" + "?=id" + currentID;
+        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetHistorialPesoID" + "?id=" + currentID;
         entriesPetWeight = new ArrayList<>();
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
@@ -171,7 +174,8 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void loadDispensedFood() {
-        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetHistorialDispensacionID" + "?=id" + currentID;
+        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetHistorialDispensacionID" + "?id=" + currentID;
+        Log.i(tag, url);
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
@@ -181,22 +185,22 @@ public class MainMenuActivity extends AppCompatActivity {
 
     public void setDispensedFood(JSONArray jsonArray) {
         try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonobject = jsonArray.getJSONObject(i);
+
+                JSONObject jsonobject = jsonArray.getJSONObject(0);
                 dispensedFood = jsonobject.getInt("valor");
-            }
+
         } catch (Exception e) {
             Log.e(tag, "Error: " + e);
         }
     }
 
     private void updateDispensedFood() {
-        TextView foodDispensedText = findViewById(R.id.food_percentage);
+        TextView foodDispensedText = findViewById(R.id.food_dispensed);
         foodDispensedText.setText(dispensedFood + " gramos");
     }
 
     private void loadFoodRemaining() {
-        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetEstacionComida" + "?=id" + currentID;
+        String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetEstacionComida" + "?id=" + currentID;
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
@@ -206,18 +210,18 @@ public class MainMenuActivity extends AppCompatActivity {
 
     public void setFoodRemaining(JSONArray jsonArray) {
         try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonobject = jsonArray.getJSONObject(i);
+
+                JSONObject jsonobject = jsonArray.getJSONObject(0);
                 foodRemaining = jsonobject.getInt("distancia");
-            }
+
         } catch (Exception e) {
             Log.e(tag, "Error: " + e);
         }
     }
 
     private void updateFoodRemaining() {
-        TextView foodRemainingText = findViewById(R.id.food_remaining);
-        foodRemainingText.setText(foodRemaining + " gramos");
+        TextView foodRemainingText = findViewById(R.id.food_percentage);
+        foodRemainingText.setText(foodRemaining + " %");
     }
 
 }
