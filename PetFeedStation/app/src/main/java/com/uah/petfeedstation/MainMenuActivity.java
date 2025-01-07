@@ -113,7 +113,14 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void loadChartData() {
-        loadPetWeight();
+        // Cargar datos de la base de datos aquí -----------------------------------------------------------------------------------------------
+        //loadPetWeight();
+
+        List<Entry> entries = new ArrayList<>();
+        // Ejemplo de datos ficticios
+        for (int i = 0; i < 30; i++) {
+            entries.add(new Entry(i, (float) (Math.random() * 10 + 50)));
+        }
 
         LineDataSet dataSet = new LineDataSet(entriesPetWeight, "Peso en los últimos 30 días");
         LineData lineData = new LineData(dataSet);
@@ -125,12 +132,15 @@ public class MainMenuActivity extends AppCompatActivity {
 
     //Busca la información del peso del animal y la recoje
     private void loadPetWeight(){
+        /*
         String url = "http://192.168.1.21:8080/ServerExampleUbicomp/GetStationsCity?cityId=";
         entriesPetWeight = new ArrayList<>();
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
         }catch (InterruptedException e){}
+
+         */
     }
 
     //Select the Cities from JSON response
@@ -147,12 +157,13 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void loadPetMeals() {
+        /*
         String url = "http://..";
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
         } catch (InterruptedException e) {
-        }
+        }*/
     }
 
     public void setEntriesMeals(JSONArray jsonarray) {
@@ -160,12 +171,15 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void loadPetHistory() {
+        /*
         String url = "http://..";
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
         } catch (InterruptedException e) {
         }
+        */
+
     }
 
     public void setEntriesHistory(JSONArray jsonarray) {
@@ -181,12 +195,15 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void loadPetSettings() {
+        /*
         String url = "http://..";
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
         } catch (InterruptedException e) {
         }
+
+         */
     }
 
     public void setEntriesSettings(JSONArray jsonarray) {

@@ -14,20 +14,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 class ServerConnectionThread extends Thread{
-    private MainMenuActivity activity;
-    private String tag = "ServerConnectionThread";
+    private MainActivity activity;
+    private String tag = "MainActivity";
     private String urlStr = "";
 
-    public ServerConnectionThread(MainMenuActivity activ, String url)    {
+    public ServerConnectionThread(MainActivity activ, String url)    {
         activity = activ;
         urlStr = url;
+        Log.i(tag, "ServerConnectionThread started");
         start();
     }
 
     @Override
     public void run()    {
         String response = "";
-
         try {
             URL url = new URL(urlStr);
             HttpURLConnection urlConnection = null;
@@ -37,6 +37,9 @@ class ServerConnectionThread extends Thread{
             response = convertStreamToString(in);
             Log.d(tag, "get json: " + response);
             JSONArray jsonarray = new JSONArray(response);
+            activity.onServerResponse(jsonarray);
+
+            /*
             //Read Responses and fill the spinner
             if(urlStr.contains("GetPetWeight")){
                 Log.e("Weight", "weight");
@@ -50,7 +53,7 @@ class ServerConnectionThread extends Thread{
             }else if (urlStr.contains("GetPetSettings")){
                 Log.e("Settings", "settings");
                 activity.setEntriesSettings(jsonarray);
-            }
+            }*/
         }
         catch (IOException | JSONException e) {
             e.printStackTrace();
