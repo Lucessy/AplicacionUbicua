@@ -124,11 +124,10 @@ public class ManualDispenserActivity extends AppCompatActivity {
                                 .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        // Volver a la pantalla activity_main
-                                        //gramsToSend = gramsToDispense;
-                                        // Actualizar y enviar la cantidad de comida restante en la base de datos aquí ---------------------------------------------------------------
+                                        Dispenser dispenser = new Dispenser(ManualDispenserActivity.this, "tcp://192.168.1.21:1883", "ubicua", "ubicua");
+                                        dispenser.dispenseFood(currentID + "/dispense", String.valueOf(gramsToDispense));
 
-                                        Intent intent = new Intent(ManualDispenserActivity.this, MainActivity.class);
+                                        Intent intent = new Intent(ManualDispenserActivity.this, MainMenuActivity.class);
                                         startActivity(intent);
                                         finish();
                                     }

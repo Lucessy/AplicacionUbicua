@@ -82,7 +82,6 @@ public class MainMenuActivity extends AppCompatActivity {
 
         /* Comida restante */
         loadFoodRemaining();
-        Log.i(tag, "Prueba");
         updateFoodRemaining();
 
         /* Grafica del peso del animal */
@@ -180,7 +179,6 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private void loadDispensedFood() {
         String url = "http://" + ipVirtualMachine + ":8080/EstacionComidaServer/GetHistorialDispensacionID" + "?id=" + currentID;
-        Log.i(tag, url);
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
