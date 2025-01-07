@@ -4,16 +4,15 @@ package com.uah.petfeedstation;
 import android.content.Context;
 import android.util.Log;
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class Dispenser {
-
     private MqttAndroidClient client;
     private static final String TAG = "Dispenser";
 

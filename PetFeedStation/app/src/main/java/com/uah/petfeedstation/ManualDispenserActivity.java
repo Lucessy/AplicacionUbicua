@@ -125,7 +125,7 @@ public class ManualDispenserActivity extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         Dispenser dispenser = new Dispenser(ManualDispenserActivity.this, "tcp://192.168.1.21:1883", "ubicua", "ubicua");
-                                        dispenser.dispenseFood(currentID + "/dispense", String.valueOf(gramsToDispense));
+                                        dispenser.dispenseFood("est" + currentID + "/dispensar", String.valueOf(gramsToDispense));
 
                                         Intent intent = new Intent(ManualDispenserActivity.this, MainMenuActivity.class);
                                         startActivity(intent);
