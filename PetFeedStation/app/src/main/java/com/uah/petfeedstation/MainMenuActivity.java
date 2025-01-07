@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -20,6 +22,9 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,6 +38,8 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final long BUTTON_DELAY = 1000; // 1 second delay
     private int dispensedFood = 0;
     private int dispensedPortions = 0;
+    private List<Entry> entriesPetWeight;
+    private String tag = "MainMenuActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,18 +113,91 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void loadChartData() {
-        List<Entry> entries = new ArrayList<>();
-        // Cargar datos de la base de datos aquí -----------------------------------------------------------------------------------------------
-        // Ejemplo de datos ficticios
-        for (int i = 0; i < 30; i++) {
-            entries.add(new Entry(i, (float) (Math.random() * 10 + 50)));
-        }
+        loadPetWeight();
 
-        LineDataSet dataSet = new LineDataSet(entries, "Peso en los últimos 30 días");
+        LineDataSet dataSet = new LineDataSet(entriesPetWeight, "Peso en los últimos 30 días");
         LineData lineData = new LineData(dataSet);
         lineChart.setData(lineData);
         lineChart.invalidate(); // refresca la gráfica
         dataSet.setColor(Color.parseColor("#FFA500")); // Establecer el color de la línea a naranja
         dataSet.setCircleColor(Color.parseColor("#FFA500")); // Establecer el color de los puntos a naranja
+    }
+
+    //Busca la información del peso del animal y la recoje
+    private void loadPetWeight(){
+        String url = "http://192.168.1.21:8080/ServerExampleUbicomp/GetStationsCity?cityId=";
+        entriesPetWeight = new ArrayList<>();
+        ServerConnectionThread thread = new ServerConnectionThread(this, url);
+        try {
+            thread.join();
+        }catch (InterruptedException e){}
+    }
+
+    //Select the Cities from JSON response
+    public void setEntriesPetWeight(JSONArray jsonCities){
+        try {
+            for (int i = 0; i < jsonCities.length(); i++) {
+                JSONObject jsonobject = jsonCities.getJSONObject(i);
+                entriesPetWeight.add(new Entry(jsonobject.getInt("day"), jsonobject.getInt("weight")));
+            }
+
+        }catch (Exception e){
+            Log.e(tag,"Error: " + e);
+        }
+    }
+
+    private void loadPetMeals() {
+        String url = "http://..";
+        ServerConnectionThread thread = new ServerConnectionThread(this, url);
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+        }
+    }
+
+    public void setEntriesMeals(JSONArray jsonarray) {
+
+    }
+
+    private void loadPetHistory() {
+        String url = "http://..";
+        ServerConnectionThread thread = new ServerConnectionThread(this, url);
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+        }
+    }
+
+    public void setEntriesHistory(JSONArray jsonarray) {
+        try {
+            for (int i = 0; i < jsonarray.length(); i++) {
+                JSONObject jsonobject = jsonarray.getJSONObject(i);
+                //entriesPetWeight.add(new Entry(jsonobject.getInt("day"), jsonobject.getInt("weight")));
+            }
+
+        }catch (Exception e){
+            Log.e(tag,"Error: " + e);
+        }
+    }
+
+    private void loadPetSettings() {
+        String url = "http://..";
+        ServerConnectionThread thread = new ServerConnectionThread(this, url);
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+        }
+    }
+
+    public void setEntriesSettings(JSONArray jsonarray) {
+        try {
+            for (int i = 0; i < jsonarray.length(); i++) {
+                JSONObject jsonobject = jsonarray.getJSONObject(i);
+                //entriesPetWeight.add(new Entry(jsonobject.getInt("day"), jsonobject.getInt("weight")));
+            }
+
+        }catch (Exception e){
+            Log.e(tag,"Error: " + e);
+        }
     }
 }
