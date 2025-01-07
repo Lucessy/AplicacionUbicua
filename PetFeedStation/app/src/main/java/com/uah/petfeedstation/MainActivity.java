@@ -21,7 +21,7 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
     private String tag = "MainActivity";
     private String registerID = "";
-    private String ipVirtualMachine = "";
+    private String ipVirtualMachine = "192.168.1.35";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private void verifyUser() {
         // Verificar si el usuario está registrado
         Log.i(tag, "Verifying user...");
-        String url = "http://" + this.ipVirtualMachine + ":8080/EstacionComidaServer/ComprobarId" + "?IdUser=" + this.registerID;
+        String url = "http://" + this.ipVirtualMachine + ":8080/EstacionComidaServer/ComprobarID?id=" + this.registerID;
         ServerConnectionThread thread = new ServerConnectionThread(this, url);
         try {
             thread.join();
