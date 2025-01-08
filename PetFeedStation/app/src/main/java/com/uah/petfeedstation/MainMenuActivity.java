@@ -57,7 +57,7 @@ public class MainMenuActivity extends AppCompatActivity {
             currentID = getIntent().getStringExtra("registerID");
             ipVirtualMachine = getIntent().getStringExtra("ipVirtualMachine");
         }
-        Log.i(tag, ipVirtualMachine);
+
         /* Texto de bienvenida */
         TextView welcomeText = findViewById(R.id.welcome_text);
         String currentDate = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("es", "ES")).format(new Date());
