@@ -75,7 +75,6 @@ public class MainMenuActivity extends AppCompatActivity {
         }
 
         /* Comida dispensada */
-
         loadDispensedFood();
         updateDispensedFood();
 

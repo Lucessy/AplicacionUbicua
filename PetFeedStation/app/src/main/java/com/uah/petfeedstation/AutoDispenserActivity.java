@@ -106,8 +106,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
                 }
 
                 // Mover la actividad a segundo plano en lugar de finalizarla
-                Intent intent = new Intent(AutoDispenserActivity.this, MainMenuActivity.class);
-                startActivity(intent);
+                finish();
             }
         });
 

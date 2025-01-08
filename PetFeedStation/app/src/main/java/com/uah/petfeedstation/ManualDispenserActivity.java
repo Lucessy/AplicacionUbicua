@@ -120,14 +120,12 @@ public class ManualDispenserActivity extends AppCompatActivity {
                     } else {
                         new AlertDialog.Builder(ManualDispenserActivity.this)
                                 .setTitle("Confirmar dispensación")
-                                .setMessage("¿Está seguro de dispensar " + gramsText + "?")
+                                .setMessage("¿Está seguro de dispensar " + gramsToDispense + " gramos?")
                                 .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         Dispenser dispenser = new Dispenser(ManualDispenserActivity.this, "tcp://192.168.1.35:1883", "ubicua", "ubicua",   currentID + "/dispensar",String.valueOf(gramsToDispense) );
 
-                                        Intent intent = new Intent(ManualDispenserActivity.this, MainMenuActivity.class);
-                                        startActivity(intent);
                                         finish();
                                     }
                                 })
