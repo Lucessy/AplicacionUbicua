@@ -125,7 +125,7 @@ public class ManualDispenserActivity extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         Dispenser dispenser = new Dispenser(ManualDispenserActivity.this, "tcp://192.168.1.35:1883", "ubicua", "ubicua",   currentID + "/dispensar",String.valueOf(gramsToDispense) );
-
+                                        dispenser.publishMessage();
                                         finish();
                                     }
                                 })

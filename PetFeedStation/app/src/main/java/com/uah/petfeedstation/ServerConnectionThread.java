@@ -27,7 +27,6 @@ class ServerConnectionThread extends Thread {
         start();
     }
 
-
     @Override
     public void run() {
         String response = "";

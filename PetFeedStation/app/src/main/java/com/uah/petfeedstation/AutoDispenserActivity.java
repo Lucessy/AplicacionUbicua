@@ -126,15 +126,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
 
         /* Botón de atrás */
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Volver a la pantalla activity_main sin guardar cambios
-                Intent intent = new Intent(AutoDispenserActivity.this, MainMenuActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
     }
 
     private void showEditMealDialog(View mealEntryView, String currentTime, String currentPortions) {

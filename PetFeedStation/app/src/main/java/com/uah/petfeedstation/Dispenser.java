@@ -18,9 +18,21 @@ import java.util.Date;
 public class Dispenser {
     private static final String TAG = "Dispenser";
     private Mqtt3AsyncClient client;
+    private String serverUri;
+    private String username;
+    private String password;
+    private String topic;
+    private String payload;
 
     public Dispenser(Context context, String serverUri, String username, String password, String topic, String payload) {
-        Log.i(TAG, "La ip es esta:"+serverUri.split(":")[1].substring(2));
+        this.serverUri = serverUri;
+        this.username = username;
+        this.password = password;
+        this.topic = topic;
+        this.payload = payload;
+    }
+
+    public void publishMessage() {
         client = MqttClient.builder()
                 .useMqttVersion3()
                 .serverHost(serverUri.split(":")[1].substring(2))
@@ -57,8 +69,6 @@ public class Dispenser {
                             Log.e(TAG, "Error publishing message", throwable);
                         } else {
                             Log.i(TAG, "Message published to topic: " + topic);
-
-
                         }
                     });
         }
