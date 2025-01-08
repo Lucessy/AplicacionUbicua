@@ -94,6 +94,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
                 String topic = "est" + currentID + "/dispensar";
                 for (Meal meal : meals) {
                     String payload = String.valueOf(Integer.parseInt(meal.getPortions()) * gramsPerPortion);
+                    Log.i("AutoDispenserActivity", "Cancelando alarma para " + meal.getTime());
                     ScheduleManager.cancelFeeding(AutoDispenserActivity.this, topic, payload);
                 }
 
@@ -280,6 +281,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
         String topic = "est" + currentID + "/dispensar";
         String payload = String.valueOf(Integer.parseInt(portions) * gramsPerPortion);
 
+        Log.i("AutoDispenserActivity", "Scheduling feeding at " + feedingTime.getTime().toString());
         ScheduleManager.scheduleFeeding(this, feedingTime, topic, payload);
     }
 
