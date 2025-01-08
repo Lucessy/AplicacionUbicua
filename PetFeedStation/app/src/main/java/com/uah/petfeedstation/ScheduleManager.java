@@ -1,4 +1,3 @@
-// ScheduleManager.java
 package com.uah.petfeedstation;
 
 import android.app.AlarmManager;
@@ -16,7 +15,7 @@ public class ScheduleManager {
         intent.putExtra("topic", topic);
         intent.putExtra("payload", payload);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             if (alarmManager.canScheduleExactAlarms()) {
@@ -45,7 +44,7 @@ public class ScheduleManager {
         intent.putExtra("topic", topic);
         intent.putExtra("payload", payload);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         Log.i("ScheduleManager", "Cancelling alarm for " + topic);
         alarmManager.cancel(pendingIntent);
     }
