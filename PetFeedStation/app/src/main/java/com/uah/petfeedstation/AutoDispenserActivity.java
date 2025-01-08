@@ -82,6 +82,11 @@ public class AutoDispenserActivity extends AppCompatActivity {
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (tempMeals.isEmpty()) {
+                    Toast.makeText(AutoDispenserActivity.this, "Debe agregar al menos una comida", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 // Mostrar el popup
                 Toast.makeText(AutoDispenserActivity.this, "Cambios guardados", Toast.LENGTH_SHORT).show();
 
