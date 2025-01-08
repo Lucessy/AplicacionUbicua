@@ -124,7 +124,7 @@ public class ManualDispenserActivity extends AppCompatActivity {
                                 .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Dispenser dispenser = new Dispenser(ManualDispenserActivity.this, "tcp://192.168.1.53:1883", "ubicua", "ubicua",   currentID + "/dispensar",String.valueOf(gramsToDispense) );
+                                        Dispenser dispenser = new Dispenser(ManualDispenserActivity.this, "tcp://" + ipVirtualMachine, "ubicua", "ubicua",   currentID + "/dispensar",String.valueOf(gramsToDispense) );
                                         dispenser.publishMessage();
                                         finish();
                                     }
