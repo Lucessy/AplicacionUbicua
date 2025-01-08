@@ -23,7 +23,7 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
     private String tag = "MainActivity";
     private String registerID = "";
-    private String ipVirtualMachine = "192.168.1.35";
+    private String ipVirtualMachine = "192.168.1.53";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
