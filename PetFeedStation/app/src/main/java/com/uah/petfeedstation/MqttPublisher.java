@@ -17,7 +17,7 @@ public class MqttPublisher extends BroadcastReceiver {
         String topic = intent.getStringExtra("topic");
         String payload = intent.getStringExtra("payload");
 
-        Dispenser dispenser = new Dispenser(context, "tcp://192.168.1.25:1883", "ubicua", "ubicua", topic, payload);
+        Dispenser dispenser = new Dispenser(context, "tcp://192.168.1.35:1883", "ubicua", "ubicua", topic, payload);
         dispenser.publishMessage();
     }
 }

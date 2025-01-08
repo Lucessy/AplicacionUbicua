@@ -27,7 +27,7 @@
         <activity android:name=".AutoDispenserActivity" />
         <activity android:name=".ManualDispenserActivity" />
         <activity android:name=".SettingsActivity" />
-        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".MqttPublisher" />
     </application>
 
 

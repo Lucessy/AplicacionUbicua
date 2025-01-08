@@ -91,7 +91,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
                 Toast.makeText(AutoDispenserActivity.this, "Cambios guardados", Toast.LENGTH_SHORT).show();
 
                 // Borrar las alarmas existentes
-                String topic = "est" + currentID + "/dispensar";
+                String topic = currentID + "/dispensar";
                 for (Meal meal : meals) {
                     String payload = String.valueOf(Integer.parseInt(meal.getPortions()) * gramsPerPortion);
                     Log.i("AutoDispenserActivity", "Cancelando alarma para " + meal.getTime());
@@ -278,7 +278,7 @@ public class AutoDispenserActivity extends AppCompatActivity {
         feedingTime.set(Calendar.MINUTE, minute);
         feedingTime.set(Calendar.SECOND, 0);
 
-        String topic = "est" + currentID + "/dispensar";
+        String topic = currentID + "/dispensar";
         String payload = String.valueOf(Integer.parseInt(portions) * gramsPerPortion);
 
         Log.i("AutoDispenserActivity", "Scheduling feeding at " + feedingTime.getTime().toString());
