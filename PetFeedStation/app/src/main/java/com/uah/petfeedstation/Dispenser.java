@@ -2,6 +2,7 @@
 package com.uah.petfeedstation;
 
 import android.content.Context;
+import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.util.Log;
 
@@ -12,6 +13,7 @@ import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAck;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 public class Dispenser {
     private static final String TAG = "Dispenser";
@@ -38,6 +40,7 @@ public class Dispenser {
                         } else {
                             Log.i(TAG, "Connected to MQTT broker: " + connAck);
                             dispenseFood(topic, payload);
+
                         }
                     });
         }
@@ -54,6 +57,8 @@ public class Dispenser {
                             Log.e(TAG, "Error publishing message", throwable);
                         } else {
                             Log.i(TAG, "Message published to topic: " + topic);
+
+
                         }
                     });
         }

@@ -27,6 +27,7 @@ class ServerConnectionThread extends Thread {
         start();
     }
 
+
     @Override
     public void run() {
         String response = "";
@@ -34,35 +35,36 @@ class ServerConnectionThread extends Thread {
             URL url = new URL(urlStr);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+
             response = convertStreamToString(in);
             Log.d(tag, "get json: " + response);
             JSONArray jsonarray = new JSONArray(response);
 
-            /* Main Activity */
-            if (activity instanceof MainActivity) {
-                ((MainActivity) activity).onServerResponse(jsonarray);
 
-            } /* Main Menu Activity */
-            else if (activity instanceof MainMenuActivity) {
+                /* Main Activity */
+                if (activity instanceof MainActivity) {
+                    ((MainActivity) activity).onServerResponse(jsonarray);
 
-                if (urlStr.contains("GetHistorialDispensacionID")) {
-                    ((MainMenuActivity) activity).setDispensedFood(jsonarray);
-                } else if (urlStr.contains("GetHistorialPesoID")) {
-                    ((MainMenuActivity) activity).setEntriesPetWeight(jsonarray);
-                }else if (urlStr.contains("GetEstacionComida")) {
-                    ((MainMenuActivity) activity).setFoodRemaining(jsonarray);
-                }
+                } /* Main Menu Activity */ else if (activity instanceof MainMenuActivity) {
 
-            } /* Manual Dispenser Activity */
-            else if (activity instanceof ManualDispenserActivity) {
-                ((ManualDispenserActivity) activity).setFoodRemaining(jsonarray);
-            } /* Automatic Dispenser Activity */
+                    if (urlStr.contains("GetHistorialDispensacionID")) {
+                        ((MainMenuActivity) activity).setDispensedFood(jsonarray);
+                    } else if (urlStr.contains("GetHistorialPesoID")) {
+                        ((MainMenuActivity) activity).setEntriesPetWeight(jsonarray);
+                    } else if (urlStr.contains("GetEstacionComida")) {
+                        ((MainMenuActivity) activity).setFoodRemaining(jsonarray);
+                    }
 
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-            Log.e(tag, "Error: " + e.getMessage());
+                } /* Manual Dispenser Activity */ else if (activity instanceof ManualDispenserActivity) {
+                    ((ManualDispenserActivity) activity).setFoodRemaining(jsonarray);
+                } /* Automatic Dispenser Activity */
+
+            } catch(IOException | JSONException e){
+                e.printStackTrace();
+                Log.e(tag, "Error: " + e.getMessage());
+            }
         }
-    }
+
 
     private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));

@@ -124,7 +124,7 @@ public class ManualDispenserActivity extends AppCompatActivity {
                                 .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Dispenser dispenser = new Dispenser(ManualDispenserActivity.this, "tcp://192.168.1.35:1883", "ubicua", "ubicua", "est" + currentID + "/dispensar",String.valueOf(gramsToDispense) );
+                                        Dispenser dispenser = new Dispenser(ManualDispenserActivity.this, "tcp://192.168.1.35:1883", "ubicua", "ubicua",   currentID + "/dispensar",String.valueOf(gramsToDispense) );
 
                                         Intent intent = new Intent(ManualDispenserActivity.this, MainMenuActivity.class);
                                         startActivity(intent);

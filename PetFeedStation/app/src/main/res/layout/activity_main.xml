@@ -24,7 +24,7 @@
         android:id="@+id/edit_register_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"
+        android:inputType="text"
         android:layout_below="@id/welcome_text"
         android:layout_margin="16dp"
         android:hint="Ingrese el usuario"/>
